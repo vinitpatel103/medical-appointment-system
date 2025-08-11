@@ -1,0 +1,71 @@
+/* Container */
+.arf-form {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 350px;
+  margin: 20px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.arf-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Label styling */
+.arf-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Input styling */
+.arf-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Buttons container */
+.arf-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+/* Button base style */
+.arf-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Submit button */
+.arf-submit {
+  background-color: #4caf50;
+  color: white;
+}
+
+.arf-submit:hover {
+  background-color: #45a049;
+}
+
+/* Cancel button */
+.arf-cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.arf-cancel:hover {
+  background-color: #d32f2f;
+}

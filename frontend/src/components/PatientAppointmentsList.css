@@ -1,0 +1,45 @@
+.patientappt-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #f8fcff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.patientappt-title {
+  color: #0c4a6e;
+  margin-bottom: 15px;
+}
+
+.patientappt-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.patientappt-table th, .patientappt-table td {
+  padding: 10px;
+  border: 1px solid #e6f2f8;
+  text-align: left;
+}
+
+.status-approved {
+  color: green;
+  font-weight: bold;
+}
+
+.status-rejected {
+  color: red;
+  font-weight: bold;
+}
+
+.status-pending {
+  color: orange;
+  font-weight: bold;
+}
+
+.patientappt-empty {
+  text-align: center;
+  color: #666;
+}

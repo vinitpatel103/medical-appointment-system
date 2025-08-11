@@ -1,0 +1,57 @@
+.patient-dashboard {
+  padding: 20px;
+  background-color: #f9fafb;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.patient-welcome {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.doctor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.doctor-item {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.doctor-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.request-btn {
+  padding: 6px 12px;
+  background-color: #4cafef;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.request-btn:hover {
+  background-color: #3498db;
+}
