@@ -12,30 +12,29 @@ async function getDoctorAvailability(req, res) {
   res.json(result.rows);
 }
 
+const { sendEmail } = require('../utils/mailer.sendgrid');
+
 // PATIENT: Request appointment
 async function requestAppointment(req, res) {
   try {
     const { doctorId, date, time } = req.body;
     const conn = await getConnection();
 
-    console.log("🔐 Decoded token:", req.user);
-
-    const result = await conn.execute(
-      `SELECT ID FROM USERS WHERE EMAIL = :email`,
+    // Get patient ID + name/email
+    const patientResult = await conn.execute(
+      `SELECT ID, NAME, EMAIL FROM USERS WHERE EMAIL = :email`,
       { email: req.user.email }
     );
+    const [patientId, patientName, patientEmail] = patientResult.rows[0];
 
-    console.log("📦 DB result.rows:", result.rows);
-    const patientId = result.rows[0][0];
-    console.log("✅ Resolved Patient ID:", patientId);
+    // Get doctor email + name
+    const doctorResult = await conn.execute(
+      `SELECT NAME, EMAIL FROM USERS WHERE ID = :id`,
+      { id: doctorId }
+    );
+    const [doctorName, doctorEmail] = doctorResult.rows[0];
 
-    console.log("📥 Insert values:", {
-      patientId,
-      doctorId,
-      date,
-      time
-    });
-
+    // Insert appointment
     await conn.execute(
       `INSERT INTO APPOINTMENTS (ID, PATIENT_ID, DOCTOR_ID, DATE_BOOKED, TIME_SLOT, STATUS)
        VALUES (APPOINTMENT_SEQ.NEXTVAL, :pat_id, :doc_id, TO_DATE(:book_date, 'YYYY-MM-DD'), :time_slot, 'Pending')`,
@@ -46,6 +45,20 @@ async function requestAppointment(req, res) {
         time_slot: time
       },
       { autoCommit: true }
+    );
+
+    // 📧 Send email to doctor
+    await sendEmail(
+      doctorEmail,
+      `New Appointment Request from ${patientName}`,
+      `<p>Dear Dr. ${doctorName},</p>
+       <p>You have a new appointment request.</p>
+       <ul>
+         <li><b>Patient:</b> ${patientName} (${patientEmail})</li>
+         <li><b>Date:</b> ${date}</li>
+         <li><b>Time:</b> ${time}</li>
+       </ul>
+       <p>Please log in to your dashboard to accept or reject the request.</p>`
     );
 
     res.json({ message: '✅ Appointment request sent!' });
@@ -173,22 +186,65 @@ async function addAvailability(req, res) {
 async function acceptAppointment(req, res) {
   const { appointmentId } = req.body;
   const conn = await getConnection();
+
+  // Update DB
   await conn.execute(
     `UPDATE APPOINTMENTS SET STATUS = 'Accepted' WHERE ID = :id`,
     { id: appointmentId },
     { autoCommit: true }
   );
+
+  // Get patient details
+  const patientResult = await conn.execute(
+    `SELECT U.NAME, U.EMAIL, A.DATE_BOOKED, A.TIME_SLOT
+     FROM APPOINTMENTS A
+     JOIN USERS U ON A.PATIENT_ID = U.ID
+     WHERE A.ID = :id`,
+    { id: appointmentId }
+  );
+  const [patientName, patientEmail, date, time] = patientResult.rows[0];
+
+  // 📧 Send email to patient
+  await sendEmail(
+    patientEmail,
+    'Your Appointment Has Been Accepted',
+    `<p>Dear ${patientName},</p>
+     <p>Your appointment request for <b>${date}</b> at <b>${time}</b> has been <span style="color:green;"><b>Accepted</b></span>.</p>`
+  );
+
   res.json({ message: 'Appointment accepted' });
 }
 
+// DOCTOR: Reject appointment
 async function rejectAppointment(req, res) {
   const { appointmentId } = req.body;
   const conn = await getConnection();
+
+  // Update DB
   await conn.execute(
     `UPDATE APPOINTMENTS SET STATUS = 'Rejected' WHERE ID = :id`,
     { id: appointmentId },
     { autoCommit: true }
   );
+
+  // Get patient details
+  const patientResult = await conn.execute(
+    `SELECT U.NAME, U.EMAIL, A.DATE_BOOKED, A.TIME_SLOT
+     FROM APPOINTMENTS A
+     JOIN USERS U ON A.PATIENT_ID = U.ID
+     WHERE A.ID = :id`,
+    { id: appointmentId }
+  );
+  const [patientName, patientEmail, date, time] = patientResult.rows[0];
+
+  // 📧 Send email to patient
+  await sendEmail(
+    patientEmail,
+    'Your Appointment Has Been Rejected',
+    `<p>Dear ${patientName},</p>
+     <p>We regret to inform you that your appointment request for <b>${date}</b> at <b>${time}</b> has been <span style="color:red;"><b>Rejected</b></span>.</p>`
+  );
+
   res.json({ message: 'Appointment rejected' });
 }
 
